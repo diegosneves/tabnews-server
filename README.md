@@ -27,4 +27,10 @@ Esperamos que você ache este projeto útil!
 
 ---
 
+## Swagger
+
+ - [Swagger Local](http://localhost:8080/api/swagger-ui/index.html#/)
+
+---
+
 ### Em construção...
