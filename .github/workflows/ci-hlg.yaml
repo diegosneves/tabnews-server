@@ -47,8 +47,8 @@ jobs:
 
       - name: check PR head branch
         run: |
-          if [[ "${{ github.head_ref }}" != release/* ]]; then
-            echo "PRs to main must come from a release/* branch. PR is from '${{ github.head_ref }}'"
+          if [[ "${{ github.head_ref }}" != develop ]]; then
+            echo "PRs to main must come from a develop branch. PR is from '${{ github.head_ref }}'"
             exit 1
           fi
 
