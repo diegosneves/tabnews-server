@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
   compression:
     enabled: true
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
@@ -12,7 +12,11 @@ server:
     context-path: /api
 
 application:
-  version: 1.0.0
+  version: ${API_VERSION}
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
 
 
 springdoc:
@@ -23,6 +27,4 @@ springdoc:
 
 logging:
   level:
-    org:
-    springframework:
-      security: DEBUG
+    org.springframework.security: DEBUG

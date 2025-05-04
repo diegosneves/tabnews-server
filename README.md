@@ -27,7 +27,7 @@ Esperamos que você ache este projeto útil!
 
 ---
 
-## Swagger
+## <img align="center" src="https://raw.githubusercontent.com/devicons/devicon/6910f0503efdd315c8f9b858234310c06e04d9c0/icons/swagger/swagger-original.svg" alt="Swagger" width="40" height="30"> Swagger
 
  - [Swagger Local](http://localhost:8080/api/swagger-ui/index.html#/)
 

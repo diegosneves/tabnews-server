@@ -1,0 +1,165 @@
+name: CI HLG
+
+on:
+  pull_request:
+    branches:
+      - 'release/*'
+  workflow_dispatch:
+  pull_request_target:
+    types: [ closed ]
+    branches:
+      - 'release/*'
+
+jobs:
+  check-application:
+    # Não executar este job quando a PR for fechada
+    if: github.event_name != 'pull_request_target'
+    strategy:
+      matrix:
+        ubuntu: [ 'ubuntu-latest' ]
+    runs-on: ${{ matrix.ubuntu }}
+
+    env:
+      SPRING_PROFILES_ACTIVE: hlg
+      API_VERSION: hlg
+
+
+    #    services:
+#      mysql:
+#        image: "mysql:8.2.0-oraclelinux8"
+#        env:
+#          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+#          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+#        ports:
+#          - 3306:3306
+#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+#
+#    env:
+#      DB_NAME: ${{ secrets.DB_NAME }}
+#      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+#      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+#      DB_HOST: 127.0.0.1
+#      DB_PORT: 3306
+
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v3
+
+      - name: check PR head branch
+        run: |
+          if [[ "${{ github.head_ref }}" != release/* ]]; then
+            echo "PRs to main must come from a release/* branch. PR is from '${{ github.head_ref }}'"
+            exit 1
+          fi
+
+      - name: Instalar SDKMAN
+        run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          echo 'source "$HOME/.sdkman/bin/sdkman-init.sh"' >> $GITHUB_ENV
+
+      - name: Configurar ambiente com SDKMAN
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk env install
+          sdk current java
+          sdk current gradle
+        shell: bash
+
+      - name: Get branch name
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_BASE_REF#release/} | cut -d'/' -f2)" >> $GITHUB_ENV
+
+      - name: Update API Version
+        run: echo "API_VERSION=hlg-${{ env.BRANCH_NAME }}" >> $GITHUB_ENV
+
+      # Removido o Configure Gradle e Cache Gradle que usavam o wrapper
+      # já que agora usaremos o Gradle instalado pelo SDKMAN
+
+      - name: Compile o Projeto
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          gradle clean build -Pspring.profiles.active=hlg -PapiVersion=${{ env.API_VERSION }} --no-daemon
+        shell: bash
+
+      - name: Rodar os Testes
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          gradle test -Pspring.profiles.active=hlg -PapiVersion=${{ env.API_VERSION }} --no-daemon
+        shell: bash
+
+
+#  build-push-image:
+#    # Executar apenas quando a PR for fechada e mesclada
+#    if: github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
+#    runs-on: ubuntu-latest
+#
+#    env:
+#      DB_NAME: ${{ secrets.DB_NAME }}
+#      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+#      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+#      SPRING_PROFILES_ACTIVE: hlg
+#
+#    steps:
+#      - name: Checkout código
+#        uses: actions/checkout@v3
+#
+#      - name: Instalar SDKMAN
+#        run: |
+#          curl -s "https://get.sdkman.io" | bash
+#          source "$HOME/.sdkman/bin/sdkman-init.sh"
+#          echo 'source "$HOME/.sdkman/bin/sdkman-init.sh"' >> $GITHUB_ENV
+#
+#      - name: Configurar ambiente com SDKMAN
+#        run: |
+#          source "$HOME/.sdkman/bin/sdkman-init.sh"
+#          sdk env install
+#          sdk current java
+#          sdk current gradle
+#        shell: bash
+#
+#      - name: Get branch name
+#        shell: bash
+#        run: |
+#          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
+#            # Para PRs fechadas, extraímos do ref da PR base
+#            REF="${{ github.event.pull_request.base.ref }}"
+#            echo "BRANCH_NAME=$(echo ${REF#release/} | cut -d'/' -f2)" >> $GITHUB_ENV
+#          else
+#            # Para fluxo normal
+#            echo "BRANCH_NAME=$(echo ${GITHUB_BASE_REF#release/} | cut -d'/' -f2)" >> $GITHUB_ENV
+#          fi
+#
+#      - name: Update API Version
+#        run: echo "API_VERSION=hlg-${{ env.BRANCH_NAME }}" >> $GITHUB_ENV
+#
+#      - name: Build com Gradle
+#        run: |
+#          source "$HOME/.sdkman/bin/sdkman-init.sh"
+#          gradle clean build -Pspring.profiles.active=hlg -PapiVersion=hlg-${{ env.BRANCH_NAME }} --no-daemon
+#        shell: bash
+#
+#      - name: Setup QEMU
+#        uses: docker/setup-qemu-action@v1
+#
+#      - name: Setup Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#
+#      - name: Login to DockerHub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: Build and push
+#        id: docker_build
+#        uses: docker/build-push-action@v4
+#        with:
+#          push: true
+#          tags: diegoneves/tabnews-server:${{ env.BRANCH_NAME }}-beta
+#          build-args: |
+#            DB_NAME=${{ env.DB_NAME }}
+#            DB_PASSWORD=${{ env.DB_PASSWORD }}
+#            DB_USERNAME=${{ env.DB_USERNAME }}
+#            SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}
+#            API_VERSION=${{ env.API_VERSION }}
