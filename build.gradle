@@ -13,6 +13,21 @@ java {
     }
 }
 
+// Pegando as propriedades passadas via linha de comando
+def springProfile = findProperty('spring.profiles.active') ?: 'dev'
+def apiVersion = findProperty('apiVersion') ?: 'dev'
+
+// Processando os recursos com as propriedades
+processResources {
+    filesMatching('**/application.yaml') {
+        expand(
+            SPRING_PROFILES_ACTIVE: springProfile,
+            API_VERSION: apiVersion
+        )
+    }
+}
+
+
 repositories {
     mavenCentral()
 }
