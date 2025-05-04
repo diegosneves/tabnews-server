@@ -1,9 +1,4 @@
-<div style="display:inline-block"><br>
-  <h1>TabNews</h1> 
-  <img align="center" alt="Diego-Spring" height="30" width="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" />
-  <img align="center" alt="Diego-Java" height="30" width="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" />  
-  <img align="center" alt="Diego-Docker" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-plain.svg">
-</div>
+# TabNews
 
 ![Spring](https://img.shields.io/badge/Spring-6DB33F?style=plastic&logo=spring&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=plastic&logo=openjdk&logoColor=white)
@@ -29,6 +24,12 @@ Este projeto tem como objetivo centralizar várias fontes de notícias em um ún
 Estamos abertos a contribuições. Se você tem interesse em melhorar o TabNews, por favor, sinta-se a vontade para fazer um fork e enviar seu pull request.
 
 Esperamos que você ache este projeto útil!
+
+---
+
+## <img align="center" src="https://raw.githubusercontent.com/devicons/devicon/6910f0503efdd315c8f9b858234310c06e04d9c0/icons/swagger/swagger-original.svg" alt="Swagger" width="40" height="30"> Swagger
+
+ - [Swagger Local](http://localhost:8080/api/swagger-ui/index.html#/)
 
 ---
 

@@ -1,0 +1,12 @@
+server:
+  port: ${PORT:8080}
+  undertow:
+    threads:
+      worker: 32
+      io: 4
+
+#logging:
+#  level:
+#    org:
+#    springframework:
+#      security: DEBUG
