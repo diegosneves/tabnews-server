@@ -1,0 +1,70 @@
+name: CI DEVELOP
+
+on:
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  check-application:
+    strategy:
+      matrix:
+        ubuntu: [ 'ubuntu-latest' ]
+    runs-on: ${{ matrix.ubuntu }}
+
+    env:
+      SPRING_PROFILES_ACTIVE: dev
+      API_VERSION: dev
+
+
+    #    services:
+#      mysql:
+#        image: "mysql:8.2.0-oraclelinux8"
+#        env:
+#          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+#          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+#        ports:
+#          - 3306:3306
+#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+#
+#    env:
+#      DB_NAME: ${{ secrets.DB_NAME }}
+#      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+#      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+#      DB_HOST: 127.0.0.1
+#      DB_PORT: 3306
+
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v3
+
+      - name: Instalar SDKMAN
+        run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+        shell: bash
+
+      - name: Configurar ambiente com SDKMAN
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk env install
+          sdk current java
+          sdk current gradle
+        shell: bash
+
+      # Removido o Configure Gradle e Cache Gradle que usavam o wrapper
+      # já que agora usaremos o Gradle instalado pelo SDKMAN
+
+      - name: Compile o Projeto
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          gradle clean build -Pspring.profiles.active=dev -PapiVersion=dev --no-daemon
+        shell: bash
+
+      - name: Rodar os Testes
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          gradle test -Pspring.profiles.active=dev -PapiVersion=dev --no-daemon
+        shell: bash
+
