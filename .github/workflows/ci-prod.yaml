@@ -62,7 +62,7 @@ jobs:
         run: |
           curl -s "https://get.sdkman.io" | bash
           source "$HOME/.sdkman/bin/sdkman-init.sh"
-          echo 'source "$HOME/.sdkman/bin/sdkman-init.sh"' >> $GITHUB_ENV
+        shell: bash
 
       - name: Configurar ambiente com SDKMAN
         run: |
@@ -108,7 +108,7 @@ jobs:
 #        run: |
 #          curl -s "https://get.sdkman.io" | bash
 #          source "$HOME/.sdkman/bin/sdkman-init.sh"
-#          echo 'source "$HOME/.sdkman/bin/sdkman-init.sh"' >> $GITHUB_ENV
+#        shell: bash
 #
 #      - name: Configurar ambiente com SDKMAN
 #        run: |
